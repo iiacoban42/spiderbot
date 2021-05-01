@@ -3,8 +3,8 @@ import os
 import scrapy
 import pickle
 
-urls_file_path = os.getcwd() + "/src/top-1m.csv"
-results_file_path = os.getcwd() + "/src/res.csv"
+urls_file_path = os.getcwd() + "/src/urls.csv"
+results_file_path = os.getcwd() + "/src/logs.csv"
 
 def get_top_websites(n):
     urls = []
