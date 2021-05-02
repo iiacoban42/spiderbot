@@ -2,6 +2,10 @@ import csv
 import os
 import scrapy
 import pickle
+import logging
+from scrapy.spidermiddlewares.httperror import HttpError
+from twisted.internet.error import TCPTimedOutError, TimeoutError, DNSLookupError
+
 
 urls_file_path = os.getcwd() + "/src/urls.csv"
 results_file_path = os.getcwd() + "/src/logs.csv"
@@ -28,5 +32,45 @@ def append_list_as_row(list_of_elem):
 class SpiderBot(scrapy.Spider):
     name = "spiderbot"
     start_urls = get_top_websites(500)
-    def parse(self, response):
+
+    def start_requests(self):
+        for u in self.start_urls:
+            yield scrapy.Request(u, callback=self.parse_http,
+                                    errback=self.errback_http,
+                                    dont_filter=True)
+
+    def parse_http(self, response):
+        self.logger.error('Got successful response from {}'.format(response.url))
         append_list_as_row([response.status, response.url])
+        # do something useful now
+
+    def errback_http(self, failure):
+        # log all errback failures,
+        # in case you want to do something special for some errors,
+        # you may need the failure's type
+        self.logger.error(repr(failure))
+
+        #if isinstance(failure.value, HttpError):
+        if failure.check(HttpError):
+            # you can get the response
+            response = failure.value.response
+            append_list_as_row([response.status, response.url])
+            self.logger.error('HttpError on %s', response.url)
+
+        #elif isinstance(failure.value, DNSLookupError):
+        elif failure.check(DNSLookupError):
+            # this is the original request
+            request = failure.request
+            append_list_as_row(["DNSLookupError", request.url])
+            self.logger.error('DNSLookupError on %s', request.url)
+
+        #elif isinstance(failure.value, TimeoutError):
+        elif failure.check(TimeoutError):
+            request = failure.request
+            append_list_as_row(["TimeoutError", request.url])
+            self.logger.error('TimeoutError on %s', request.url)
+        
+        elif failure.check(TCPTimedOutError):
+            request = failure.request
+            append_list_as_row(["TCPTimeout", request.url])
+            self.logger.error('TCPTimeout on %s', request.url)
