@@ -95,7 +95,6 @@ class SpiderBot(scrapy.Spider):
         
         elapsed = []
         end_times_copy = self.end_times.copy()
-        print(self.end_times)
         elapsed.append([end_times_copy[0] - start_time])
         for i in range(1, self.n):
             time_diff = end_times_copy[i] - self.end_times[i-1] 

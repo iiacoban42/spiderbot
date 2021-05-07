@@ -8,9 +8,9 @@ import datetime
 from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import TCPTimedOutError, TimeoutError, DNSLookupError
 
-urls_file_path = os.getcwd() + "/i2p/scraper/urls.csv"
-results_file_path = os.getcwd() + "/i2p/scraper/logs.csv"
-times_results = os.getcwd() + "/i2p/scraper/times_results.csv"
+urls_file_path = os.getcwd() + "/i2p/i2p/scraper/urls.csv"
+results_file_path = os.getcwd() + "/i2p/i2p/scraper/logs.csv"
+times_results = os.getcwd() + "/i2p/i2p/scraper/times_results.csv"
 
 def clear_files():
     files = [results_file_path, times_results]
@@ -96,7 +96,6 @@ class I2P_Spider(scrapy.Spider):
         
         elapsed = []
         end_times_copy = self.end_times.copy()
-        print(self.end_times)
         elapsed.append([end_times_copy[0] - start_time])
         for i in range(1, self.n):
             time_diff = end_times_copy[i] - self.end_times[i-1] 
