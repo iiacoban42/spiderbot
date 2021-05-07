@@ -10,11 +10,10 @@ from twisted.internet.error import TCPTimedOutError, TimeoutError, DNSLookupErro
 
 urls_file_path = os.getcwd() + "/src/urls.csv"
 results_file_path = os.getcwd() + "/src/logs.csv"
-times = os.getcwd() + "/src/times.csv"
 times_results = os.getcwd() + "/src/times_results.csv"
 
 def clear_files():
-    files = [results_file_path, times, times_results]
+    files = [results_file_path, times_results]
     for file in files:
         open(file, 'w').close()
 
@@ -37,22 +36,14 @@ def append_list_as_row(list_of_elem, file):
         csv_writer = csv.writer(write_obj)
         # Add contents of list as last row in the csv file
         csv_writer.writerow(list_of_elem)
+   
 
-def get_time_stats(start):
-    elapsed = []
-    with open(times) as csv_file:
-        reader = csv.reader(csv_file)
-        for line in reader:
-            time_diff = float(line[0]) - float(start)
-            elapsed.append([time_diff])
-    
-    with open(times_results, 'w') as csv_file:
-        writer = csv.writer(csv_file)
-        writer.writerows(elapsed)
 
 class SpiderBot(scrapy.Spider):
     name = "spiderbot"
-    start_urls = get_top_websites(10)
+    n = 10
+    start_urls = get_top_websites(n)
+    end_times = []
     def start_requests(self):
         clear_files()
         for url in self.start_urls:
@@ -62,20 +53,23 @@ class SpiderBot(scrapy.Spider):
 
     def parse_http(self, response):
         # Successful request
-        append_list_as_row([datetime.datetime.now().timestamp()], times)
+        end_time = datetime.datetime.now().timestamp()
+        self.end_times.append(end_time)
+
         self.logger.error('Got successful response from {}'.format(response.url))
-        append_list_as_row([response.status, response.url], results_file_path)
+        append_list_as_row([response.status, end_time,  response.url], results_file_path)
 
 
     def errback_http(self, failure):
         # log all errback failures
         self.logger.error(repr(failure))
-        append_list_as_row([datetime.datetime.now().timestamp()], times)
+        end_time = datetime.datetime.now().timestamp()
+        self.end_times.append(end_time)
 
         #if isinstance(failure.value, HttpError):
         if failure.check(HttpError):
             response = failure.value.response
-            append_list_as_row([response.status, response.url], results_file_path)
+            append_list_as_row([response.status, end_time, response.url], results_file_path)
             self.logger.error('HttpError on %s', response.url)
 
         #elif isinstance(failure.value, DNSLookupError):
@@ -97,6 +91,18 @@ class SpiderBot(scrapy.Spider):
             self.logger.error('TimeoutError on %s', request.url)
 
     def close(self, reason):
-        start_time = self.crawler.stats.get_value('start_time')
-        get_time_stats(start_time.timestamp())
+        start_time = self.crawler.stats.get_value('start_time').timestamp()
+        
+        elapsed = []
+        end_times_copy = self.end_times.copy()
+        print(self.end_times)
+        elapsed.append([end_times_copy[0] - start_time])
+        for i in range(1, self.n):
+            time_diff = end_times_copy[i] - self.end_times[i-1] 
+            elapsed.append([time_diff])
+
+        with open(times_results, 'w') as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerows(elapsed)
+        
 
