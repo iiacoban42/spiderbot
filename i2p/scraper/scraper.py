@@ -8,9 +8,9 @@ import datetime
 from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import TCPTimedOutError, TimeoutError, DNSLookupError
 
-urls_file_path = os.getcwd() + "/src/urls.csv"
-results_file_path = os.getcwd() + "/src/logs.csv"
-times_results = os.getcwd() + "/src/times_results.csv"
+urls_file_path = os.getcwd() + "/i2p/scraper/urls.csv"
+results_file_path = os.getcwd() + "/i2p/scraper/logs.csv"
+times_results = os.getcwd() + "/i2p/scraper/times_results.csv"
 
 def clear_files():
     files = [results_file_path, times_results]
@@ -39,8 +39,8 @@ def append_list_as_row(list_of_elem, file):
    
 
 
-class SpiderBot(scrapy.Spider):
-    name = "spiderbot"
+class I2P_Spider(scrapy.Spider):
+    name = "i2p"
     n = 10
     start_urls = get_top_websites(n)
     end_times = []
@@ -49,7 +49,8 @@ class SpiderBot(scrapy.Spider):
         for url in self.start_urls:
             yield scrapy.Request(url, callback=self.parse_http,
                                     errback=self.errback_http,
-                                    dont_filter=True)
+                                    dont_filter=True,
+                                    meta={"proxy": "http://127.0.0.1:4444"})
 
     def parse_http(self, response):
         # Successful request
@@ -104,5 +105,3 @@ class SpiderBot(scrapy.Spider):
         with open(times_results, 'w') as csv_file:
             writer = csv.writer(csv_file)
             writer.writerows(elapsed)
-        
-
