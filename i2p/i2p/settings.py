@@ -1,34 +1,4 @@
-Skip to content
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@iiacoban42 
-Abellan09
-/
-i2p_crawler
-3
-44
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-i2p_crawler/crawler/i2p/i2p/settings.py /
-@Abellan09
-Abellan09 Setting the maximum depth that will be allowed to crawl for any site
-Latest commit 860d29a on Dec 2, 2018
- History
- 1 contributor
-Executable File  82 lines (66 sloc)  2.58 KB
- 
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 
 # Scrapy settings for i2p project
 #

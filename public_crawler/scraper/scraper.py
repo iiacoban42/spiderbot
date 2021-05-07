@@ -8,9 +8,11 @@ import datetime
 from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import TCPTimedOutError, TimeoutError, DNSLookupError
 
-urls_file_path = os.getcwd() + "/public_crawler/scraper/urls.csv"
-results_file_path = os.getcwd() + "/public_crawler/scraper/logs.csv"
-times_results = os.getcwd() + "/public_crawler/scraper/times_results.csv"
+folder_path = os.getcwd() + "/public_crawler/scraper/"
+
+urls_file_path = folder_path + "urls.csv"
+results_file_path = folder_path  + "logs/logs.csv"
+times_results = folder_path + "logs/times_results.csv"
 
 def clear_files():
     files = [results_file_path, times_results]
