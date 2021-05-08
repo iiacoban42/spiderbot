@@ -51,11 +51,17 @@ RETRY_TIMES = 2
 #    'i2p.middlewares.I2PSpiderMiddleware': 543,
 #}
 
+SELENIUM_DRIVER_NAME = 'chrome' #driver
+SELENIUM_DRIVER_EXECUTABLE_PATH = '/usr/bin/chromedriver' #driver
+#chrome
+SELENIUM_DRIVER_ARGUMENTS=['--headless', '--no-sandbox', '--disable-gpu'] 
+
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     'i2p.middlewares.I2PProxyMiddleware': 200,
     'i2p.middlewares.I2PFilterMiddleware': 300,
+    'scrapy_selenium.SeleniumMiddleware': 800
 }
 
 # Enable or disable extensions

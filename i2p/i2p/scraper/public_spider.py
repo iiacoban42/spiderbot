@@ -6,28 +6,35 @@ import logging
 import time
 import datetime
 import importlib
-util = importlib.import_module("util")
-from scrapy.spidermiddlewares.httperror import HttpError
-from twisted.internet.error import TCPTimedOutError, TimeoutError, DNSLookupError
 
-folder_path = os.getcwd() + "/src/i2p/scraper/"
+from scrapy.spidermiddlewares.httperror import HttpError
+from scrapy_selenium import SeleniumRequest
+from twisted.internet.error import TCPTimedOutError, TimeoutError, DNSLookupError
+from selenium import webdriver
+
+util = importlib.import_module("util")
+folder_path = os.getcwd() + "/i2p/i2p/scraper/"
 
 urls_file_path = folder_path + "urls.csv"
-results_file_path = folder_path  + "logs/logs_i2p.csv"
-times_results = folder_path + "logs/times_results_i2p.csv"
+results_file_path = folder_path  + "logs/logs_public.csv"
+times_results = folder_path + "logs/times_results_public.csv"
+stats = folder_path + "logs/stats_public.csv"
 
-class I2P_Spider(scrapy.Spider):
-    name = "i2p"
+
+class SpiderBot(scrapy.Spider):
+    name = "spiderbot"
     n = 10
     start_urls = util.get_top_websites(n)
     end_times = []
     def start_requests(self):
         util.clear_files()
         for url in self.start_urls:
+            
+            # yield SeleniumRequest(url=url, callback=self.parse_http, errback=self.errback_http, dont_filter=True)
+
             yield scrapy.Request(url, callback=self.parse_http,
                                     errback=self.errback_http,
-                                    dont_filter=True,
-                                    meta={"proxy": "http://127.0.0.1:4444"})
+                                    dont_filter=True)
 
     def parse_http(self, response):
         # Successful request
@@ -68,16 +75,7 @@ class I2P_Spider(scrapy.Spider):
             util.append_list_as_row(["TimeoutError", request.url], results_file_path)
             self.logger.error('TimeoutError on %s', request.url)
 
-    # def close(self, reason):
-    #     start_time = self.crawler.stats.get_value('start_time').timestamp()
-        
-    #     elapsed = []
-    #     end_times_copy = self.end_times.copy()
-    #     elapsed.append([end_times_copy[0] - start_time])
-    #     for i in range(1, self.n):
-    #         time_diff = end_times_copy[i] - self.end_times[i-1] 
-    #         elapsed.append([time_diff])
-
-    #     with open(times_results, 'w') as csv_file:
-    #         writer = csv.writer(csv_file)
-    #         writer.writerows(elapsed)
+    def close(self, reason):
+        start_time = self.crawler.stats.get_value('start_time').timestamp()
+        finish_time = self.crawler.stats.get_value('finish_time').timestamp()
+        util.compile_stats(results_file_path, stats, finish_time-start_time)
