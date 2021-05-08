@@ -23,7 +23,7 @@ stats = folder_path + "logs/stats_public.csv"
 
 class SpiderBot(scrapy.Spider):
     name = "spiderbot"
-    n = 10
+    n = 500
     start_urls = util.get_top_websites(n)
     end_times = []
     def start_requests(self):
@@ -60,19 +60,19 @@ class SpiderBot(scrapy.Spider):
         #elif isinstance(failure.value, DNSLookupError):
         elif failure.check(DNSLookupError):
             request = failure.request
-            util.append_list_as_row(["DNSLookupError", request.url], results_file_path)
+            util.append_list_as_row(["DNSLookupError", end_time, request.url], results_file_path)
             self.logger.error('DNSLookupError on %s', request.url)
 
         #elif isinstance(failure.value, TCPTimedOutError):
         elif failure.check(TCPTimedOutError):
             request = failure.request
-            util.append_list_as_row(["TCPTimeout", request.url], results_file_path)
+            util.append_list_as_row(["TCPTimeout", end_time, request.url], results_file_path)
             self.logger.error('TCPTimeout on %s', request.url)
 
         #elif isinstance(failure.value, TimeoutError):
         elif failure.check(TimeoutError):
             request = failure.request
-            util.append_list_as_row(["TimeoutError", request.url], results_file_path)
+            util.append_list_as_row(["TimeoutError", end_time, request.url], results_file_path)
             self.logger.error('TimeoutError on %s', request.url)
 
     def close(self, reason):
