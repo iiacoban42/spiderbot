@@ -1,5 +1,4 @@
 import csv
-import scrapy
 import pickle
 import time
 import datetime
