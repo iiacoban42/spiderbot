@@ -52,8 +52,6 @@ def compile_stats(logs_file, stats_file, runtime):
     res = []
     for key in freq:
         frequency = freq[key]
-        print(n)
-        print(freq[key])
         freq_percent = freq[key] / n * 100 
         res.append([key, frequency, str(freq_percent) + "%"])
    
