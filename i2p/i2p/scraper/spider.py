@@ -8,6 +8,7 @@ import datetime
 import importlib
 
 from scrapy.spidermiddlewares.httperror import HttpError
+from scrapy.exceptions import NotConfigured, IgnoreRequest
 from scrapy_selenium import SeleniumRequest
 from twisted.internet.error import TCPTimedOutError, TimeoutError, DNSLookupError
 from selenium import webdriver
@@ -27,7 +28,7 @@ stats_i2p = folder_path + "logs/stats_i2p.csv"
 
 class SpiderBot(scrapy.Spider):
     name = "spiderbot"
-    n = 100000
+    n = 500
     start_urls = util.get_top_websites(n)
     end_times = []
     def start_requests(self):
@@ -36,93 +37,113 @@ class SpiderBot(scrapy.Spider):
             
             # yield SeleniumRequest(url=url, callback=self.parse_http, errback=self.errback_http, dont_filter=True)
             # public request
-            yield scrapy.Request(url, callback=self.parse_http,
-                                    errback=self.errback_http,
+            yield scrapy.Request(url, callback=self.parse_http, \
+                                    errback=self.errback_http, \
+                                    cb_kwargs=dict(main_url=url), \
                                     dont_filter=True)
             # i2p request
-            yield scrapy.Request(url, callback=self.parse_http_i2p,
-                                    errback=self.errback_http_i2p,
+            yield scrapy.Request(url, callback=self.parse_http_i2p, \
+                                    errback=self.errback_http_i2p, \
+                                    cb_kwargs=dict(main_url=url), \
                                     dont_filter=True,
                                     meta={
                                     "proxy": "http://127.0.0.1:4444"
                                         })
     
-    def parse_http(self, response):
+    def parse_http(self, response, main_url):
         # Successful request
         end_time = datetime.datetime.now().timestamp()
         self.end_times.append(end_time)
 
+        if 'captcha' in response.meta.keys():
+            util.append_list_as_row(["CAPTCHA", end_time, main_url, response.url], logs_public)
+        else:
         # self.logger.error('Got successful response from {}'.format(response.url))
-        util.append_list_as_row([response.status,  response.url, end_time], logs_public)
+            util.append_list_as_row([response.status, end_time, main_url, response.url], logs_public)
 
-    def parse_http_i2p(self, response):
+    def parse_http_i2p(self, response, main_url):
         # Successful request
         end_time = datetime.datetime.now().timestamp()
         self.end_times.append(end_time)
-
+        
+        if 'captcha' in response.meta.keys():
+            util.append_list_as_row(["CAPTCHA", end_time, main_url, response.url], logs_i2p)
         # self.logger.error('Got successful response from {}'.format(response.url))
-        util.append_list_as_row([response.status,  response.url, end_time], logs_i2p)
+        else:
+            util.append_list_as_row([response.status, end_time, main_url, response.url], logs_i2p)
 
 
-    def errback_http(self, failure):
+    def errback_http(self, failure, main_url=None):
         # log all errback failures
+        request = failure.request
         self.logger.error(repr(failure))
         end_time = datetime.datetime.now().timestamp()
         self.end_times.append(end_time)
-
+        
+        if failure.check(IgnoreRequest("Forbidden by robots.txt")):
+            util.append_list_as_row(["robots.txt", end_time, request.url], logs_public)
         #if isinstance(failure.value, HttpError):
-        if failure.check(HttpError):
+        elif failure.check(HttpError):
             response = failure.value.response
-            util.append_list_as_row([response.status, response.url, end_time], logs_public)
+
+            if 'captcha' in response.meta.keys():
+                util.append_list_as_row(["CAPTCHA", end_time, request.url], logs_public)
+            else:
+                util.append_list_as_row([response.status, end_time, request.url], logs_public)
             # self.logger.error('HttpError on %s', response.url)
 
         #elif isinstance(failure.value, DNSLookupError):
         elif failure.check(DNSLookupError):
-            request = failure.request
-            # util.append_list_as_row(["DNSLookupError", request.url, end_time], logs_public)
+            util.append_list_as_row(["DNSLookupError", end_time, request.url], logs_public)
             # self.logger.error('DNSLookupError on %s', request.url)
 
         #elif isinstance(failure.value, TCPTimedOutError):
         elif failure.check(TCPTimedOutError):
-            request = failure.request
-            util.append_list_as_row(["TCPTimeout", request.url, end_time], logs_public)
+            util.append_list_as_row(["TCPTimeout", end_time, request.url], logs_public)
             # self.logger.error('TCPTimeout on %s', request.url)
 
         #elif isinstance(failure.value, TimeoutError):
         elif failure.check(TimeoutError):
-            request = failure.request
-            util.append_list_as_row(["TimeoutError", request.url, end_time], logs_public)
+            util.append_list_as_row(["TimeoutError", end_time, request.url], logs_public)
             # self.logger.error('TimeoutError on %s', request.url)
+        else:
+            util.append_list_as_row(["Err", end_time, request.url], logs_public)
 
-    def errback_http_i2p(self, failure):
+    def errback_http_i2p(self, failure, main_url=None):
         # log all errback failures
+        request = failure.request
+
         self.logger.error(repr(failure))
         end_time = datetime.datetime.now().timestamp()
         self.end_times.append(end_time)
-
+        
+        if failure.check(IgnoreRequest("Forbidden by robots.txt")):
+            util.append_list_as_row(["robots.txt", end_time, request.url], logs_i2p)
         #if isinstance(failure.value, HttpError):
-        if failure.check(HttpError):
+        elif failure.check(HttpError):
             response = failure.value.response
-            util.append_list_as_row([response.status, response.url, end_time], logs_i2p)
+            if 'captcha' in response.meta.keys():
+                util.append_list_as_row(["CAPTCHA", end_time, request.url], logs_i2p)
+            else:
+                util.append_list_as_row([response.status, end_time, request.url], logs_i2p)
             # self.logger.error('HttpError on %s', response.url)
 
         #elif isinstance(failure.value, DNSLookupError):
         elif failure.check(DNSLookupError):
-            request = failure.request
-            # util.append_list_as_row(["DNSLookupError", request.url, end_time], logs_i2p)
+            util.append_list_as_row(["DNSLookupError", end_time, request.url], logs_i2p)
             # self.logger.error('DNSLookupError on %s', request.url)
 
         #elif isinstance(failure.value, TCPTimedOutError):
         elif failure.check(TCPTimedOutError):
-            request = failure.request
-            util.append_list_as_row(["TCPTimeout", request.url, end_time], logs_i2p)
+            util.append_list_as_row(["TCPTimeout", end_time, request.url], logs_i2p)
             # self.logger.error('TCPTimeout on %s', request.url)
 
         #elif isinstance(failure.value, TimeoutError):
         elif failure.check(TimeoutError):
-            request = failure.request
-            util.append_list_as_row(["TimeoutError", request.url, end_time], logs_i2p)
+            util.append_list_as_row(["TimeoutError", end_time, request.url], logs_i2p)
             # self.logger.error('TimeoutError on %s', request.url)
+        else:
+            util.append_list_as_row(["Err", end_time, request.url], logs_i2p)
 
     def close(self, reason):
         start_time = self.crawler.stats.get_value('start_time').timestamp()

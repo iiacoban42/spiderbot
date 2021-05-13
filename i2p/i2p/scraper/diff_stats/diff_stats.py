@@ -28,6 +28,31 @@ def status_codes_stats(responce_codes, stats_file):
         writer = csv.writer(file)
         writer.writerows(res)
 
+def success(site):
+    if (re.search("^2..", site) or re.search("^3..", site)):
+        return True
+    return False
+
+def dup(a):
+    seen = {}
+    dupes = []
+
+    for x in a:
+        if x not in seen:
+            seen[x] = 1
+        else:
+            if seen[x] == 1:
+                dupes.append(x)
+            seen[x] += 1
+    return dupes
+
+def remove_protocol(url):
+    if url.startswith('http'):
+        url = re.sub(r'https?:\\', '', url)
+    if url.startswith('www.'):
+        url = re.sub(r'www.', '', url)
+    return url
+
 def get_diff_stats():
     responce_i2p = []
     responce_public = []
@@ -37,13 +62,18 @@ def get_diff_stats():
         reader = csv.reader(csv_file)
         for i, line in enumerate(reader):
             responce_public.append(line[0])
-            websites_public.append(line[1])
+            websites_public.append(line[2])
 
     with open(path_i2p) as csv_file:
         reader = csv.reader(csv_file)
         for i, line in enumerate(reader):
             responce_i2p.append(line[0])
-            websites_i2p.append(line[1])
+            websites_i2p.append(line[2])
+
+    for url in websites_i2p:
+        url = remove_protocol(url)
+    for url in websites_public:
+        url = remove_protocol(url)
 
     rejected_i2p = []
     rejected_public = []
@@ -52,6 +82,7 @@ def get_diff_stats():
 
     status_codes_i2p = []
     status_codes_public = []
+    misc = []
 
     for i, i2p_site in enumerate(websites_i2p):
         for j, pub_site in enumerate(websites_public):
@@ -59,17 +90,27 @@ def get_diff_stats():
                 status_codes_i2p.append(responce_i2p[i])
                 status_codes_public.append(responce_public[j])
 
-                if (re.search("^2..", responce_i2p[i]) or re.search("^3..", responce_i2p[i])) and\
-                    (re.search("^2..", responce_public[j]) or re.search("^3..", responce_public[j])):
+                if success(responce_i2p[i]) and success(responce_public[j]):
                     accepted_both.append([responce_public[j], responce_i2p[i], i2p_site])
 
-                elif re.search("^2..", responce_i2p[i]) or re.search("^3..", responce_i2p[i]):
+                elif success(responce_i2p[i]):
                     rejected_public.append([responce_public[j], responce_i2p[i], i2p_site])
 
-                elif re.search("^2..", responce_public[j]) or re.search("^3..", responce_public[j]):
+                elif success(responce_public[j]):
                     rejected_i2p.append([responce_public[j], responce_i2p[i], i2p_site])
 
                 else: rejected_both.append([responce_public[j], responce_i2p[i], i2p_site])
+
+    union = []
+    union.extend(accepted_both)
+    union.extend(rejected_both)
+    union.extend(rejected_i2p)
+    union.extend(rejected_public)
+
+    i2p_misc = set(websites_i2p)
+    pup_misc = set(websites_public)
+
+    print(dup(websites_i2p))
 
     write_to_file(path + "accepted_both.csv", accepted_both)
     write_to_file(path + "rejected_both.csv", rejected_both)
@@ -88,6 +129,9 @@ def get_diff_stats():
     print('rejected public: ' + str(len(rejected_public)) + " out of "+ str(total)+" -> " + str(p_rejected_public)+"%")
     print('rejected both: ' + str(len(rejected_both)) + " out of "+ str(total)+" -> " + str(p_rejected_both)+"%")
     print('accepted both: ' + str(len(accepted_both)) + " out of "+ str(total)+" -> " + str(p_accepted_both)+"%")
+
+    print(len(i2p_misc))
+    print(len(pup_misc))
 
 get_diff_stats()
 
