@@ -86,17 +86,18 @@ def get_diff_stats():
                 if success(responce_i2p[i]) and success(responce_public[j]):
                     accepted_both.append([responce_public[j], responce_i2p[i], i2p_site])
 
-                elif success(responce_i2p[i]):
+                elif success(responce_i2p[i]) and not success(responce_public[j]):
                     rejected_public.append([responce_public[j], responce_i2p[i], i2p_site])
 
-                elif success(responce_public[j]):
+                elif success(responce_public[j]) and not success(responce_i2p[i]):
                     rejected_i2p.append([responce_public[j], responce_i2p[i], i2p_site])
 
-                else: rejected_both.append([responce_public[j], responce_i2p[i], i2p_site])
+                elif not success(responce_i2p[i]) and not success(responce_public[j]):
+                    rejected_both.append([responce_public[j], responce_i2p[i], i2p_site])
 
     i2p_misc = []
     pub_misc = []
-
+    print(len(union))
     for site in websites_i2p:
         if site not in union:
             i2p_misc.append(site)
@@ -109,6 +110,7 @@ def get_diff_stats():
     print(i2p_misc)
     print(pub_misc)
 
+    print(dup(union))
     write_to_file(path + "accepted_both.csv", accepted_both)
     write_to_file(path + "rejected_both.csv", rejected_both)
     write_to_file(path + "rejected_i2p.csv", rejected_i2p)
