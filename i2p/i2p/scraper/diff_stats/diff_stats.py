@@ -48,10 +48,10 @@ def dup(a):
 
 def remove_protocol(url):
     if url.startswith('http'):
-        url = re.sub(r'https?:\\', '', url)
+        url = re.sub(r'^https?:\/\/', '', url)
     if url.startswith('www.'):
         url = re.sub(r'www.', '', url)
-    return url
+    return url.strip('/')
 
 def get_diff_stats():
     responce_i2p = []
@@ -62,34 +62,27 @@ def get_diff_stats():
         reader = csv.reader(csv_file)
         for i, line in enumerate(reader):
             responce_public.append(line[0])
-            websites_public.append(line[2])
+            websites_public.append(remove_protocol(line[2]))
 
     with open(path_i2p) as csv_file:
         reader = csv.reader(csv_file)
         for i, line in enumerate(reader):
             responce_i2p.append(line[0])
-            websites_i2p.append(line[2])
-
-    for url in websites_i2p:
-        url = remove_protocol(url)
-    for url in websites_public:
-        url = remove_protocol(url)
+            websites_i2p.append(remove_protocol(line[2]))
 
     rejected_i2p = []
     rejected_public = []
     rejected_both = []
     accepted_both = []
 
-    status_codes_i2p = []
-    status_codes_public = []
     misc = []
+
+    union = []
 
     for i, i2p_site in enumerate(websites_i2p):
         for j, pub_site in enumerate(websites_public):
             if i2p_site == pub_site:
-                status_codes_i2p.append(responce_i2p[i])
-                status_codes_public.append(responce_public[j])
-
+                union.append(i2p_site)
                 if success(responce_i2p[i]) and success(responce_public[j]):
                     accepted_both.append([responce_public[j], responce_i2p[i], i2p_site])
 
@@ -101,24 +94,28 @@ def get_diff_stats():
 
                 else: rejected_both.append([responce_public[j], responce_i2p[i], i2p_site])
 
-    union = []
-    union.extend(accepted_both)
-    union.extend(rejected_both)
-    union.extend(rejected_i2p)
-    union.extend(rejected_public)
+    i2p_misc = []
+    pub_misc = []
 
-    i2p_misc = set(websites_i2p)
-    pup_misc = set(websites_public)
+    for site in websites_i2p:
+        if site not in union:
+            i2p_misc.append(site)
+    for site in websites_public:
+        if site not in union:
+            pub_misc.append(site)
 
-    print(dup(websites_i2p))
+    i2p_misc.sort()
+    pub_misc.sort()
+    print(i2p_misc)
+    print(pub_misc)
 
     write_to_file(path + "accepted_both.csv", accepted_both)
     write_to_file(path + "rejected_both.csv", rejected_both)
     write_to_file(path + "rejected_i2p.csv", rejected_i2p)
     write_to_file(path + "rejected_public.csv",  rejected_public)
 
-    status_codes_stats(status_codes_i2p, path + "code_stats_i2p.csv")
-    status_codes_stats(status_codes_public, path + "code_stats_public.csv")
+    status_codes_stats(responce_i2p, path + "code_stats_i2p.csv")
+    status_codes_stats(responce_public, path + "code_stats_public.csv")
 
     total = len(rejected_i2p) + len(rejected_public) + len(rejected_both) + len(accepted_both) 
     p_rejected_i2p = len(rejected_i2p)  / total * 100
@@ -131,7 +128,7 @@ def get_diff_stats():
     print('accepted both: ' + str(len(accepted_both)) + " out of "+ str(total)+" -> " + str(p_accepted_both)+"%")
 
     print(len(i2p_misc))
-    print(len(pup_misc))
+    print(len(pub_misc))
 
 get_diff_stats()
 
