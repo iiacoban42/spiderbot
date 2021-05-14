@@ -47,9 +47,12 @@ CONCURRENT_REQUESTS_PER_IP = 1
 
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
-#SPIDER_MIDDLEWARES = {
-#    'i2p.middlewares.I2PSpiderMiddleware': 543,
-#}
+SPIDER_MIDDLEWARES = {
+   'i2p.middlewares.I2PSpiderMiddleware': 543,
+   'scrapy_splash.SplashDeduplicateArgsMiddleware': 100
+}
+
+SPLASH_URL = 'http://192.168.59.103:8050'
 
 SELENIUM_DRIVER_NAME = 'chrome' #driver
 SELENIUM_DRIVER_EXECUTABLE_PATH = '/usr/bin/chromedriver' #driver
@@ -61,7 +64,10 @@ SELENIUM_DRIVER_ARGUMENTS=['--headless', '--no-sandbox', '--disable-gpu']
 DOWNLOADER_MIDDLEWARES = {
     'i2p.middlewares.I2PProxyMiddleware': 200,
     'i2p.middlewares.I2PFilterMiddleware': 300,
-    'scrapy_selenium.SeleniumMiddleware': 800
+    'scrapy_selenium.SeleniumMiddleware': 800,
+    'scrapy_splash.SplashCookiesMiddleware': 723,
+    'scrapy_splash.SplashMiddleware': 725,
+    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
 }
 
 # Enable or disable extensions

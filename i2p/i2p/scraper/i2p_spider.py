@@ -22,12 +22,22 @@ class I2P_Spider(scrapy.Spider):
     n = 10
     start_urls = util.get_top_websites(n)
     end_times = []
+    user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
+    headers =  {
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'en-GB,en-US;q=0.9,en;q=0.8',
+    'Connection': 'keep-alive',
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
+    'X-Requested-With': 'XMLHttpRequest'
+}
     def start_requests(self):
         util.clear_files()
         for url in self.start_urls:
             yield scrapy.Request(url, callback=self.parse_http,
                                     errback=self.errback_http,
                                     dont_filter=True,
+                                    headers=self.headers,
                                     meta={
                                     "proxy": "http://127.0.0.1:4444"
                                         })
