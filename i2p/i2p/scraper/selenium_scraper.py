@@ -20,25 +20,30 @@ urls_file_path = folder_path + "urls.csv"
 results_file_path = folder_path  + "logs/logs_public.csv"
 times_results = folder_path + "logs/times_results_public.csv"
 stats = folder_path + "logs/stats_public.csv"
-screenshot = folder_path + "screenshots/pup/"
+screenshot_pub = folder_path + "screenshots/pub/"
+screenshot_i2p = folder_path + "screenshots/i2p/"
 
 n = 1
 start_urls = util.get_top_websites(n)
+PROXY = "127.0.0.1:4444"
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--proxy-server=%s' % PROXY)
 
 def run_spider():
 
-    driver = webdriver.Chrome()
-
     for url in start_urls:
-
-        driver.get(url)
+        with webdriver.Chrome(chrome_options=chrome_options) as i2p_driver:
+            save = screenshot_i2p + 'test' +'.png'
+            i2p_driver.get(url)
+            time.sleep(2)
+            i2p_driver.save_screenshot(save)
         
         
-        save = screenshot + 'test' +'.png'
-        driver.save_screenshot(save)
+        with webdriver.Chrome() as driver:
+            save = screenshot_pub + 'test' +'.png'
+            driver.get(url)
+            time.sleep(2)
+            driver.save_screenshot(save)
         
-        time.sleep(2)
-    
-    driver.close()
 
 run_spider()
