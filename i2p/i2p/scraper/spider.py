@@ -27,7 +27,7 @@ stats_i2p = folder_path + "logs/stats_i2p.csv"
 
 class SpiderBot(scrapy.Spider):
     name = "spiderbot"
-    n = 2
+    n = 500
     start_urls = util.get_top_websites(n)
     end_times = []
     user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'

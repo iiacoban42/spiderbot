@@ -7,6 +7,7 @@ import time
 import datetime
 import importlib
 import time
+import urllib as url
 from scrapy_splash import SplashRequest
 from Screenshot import Screenshot_Clipping
 from webdriver_manager.chrome import ChromeDriverManager
@@ -41,23 +42,36 @@ class SpiderBot(scrapy.Spider):
     'X-Requested-With': 'XMLHttpRequest'
     }
     
-    # def start_requests(self):
-    #     util.clear_files()
-    #     for url in self.start_urls:
+    def start_requests(self):
+        util.clear_files()
+        for url in self.start_urls:
             
-    #         yield SeleniumRequest(url=url, callback=self.parse_http, errback=self.errback_http, dont_filter=True)
+            # yield SeleniumRequest(url=url, callback=self.parse_http, errback=self.errback_http, dont_filter=True)
+            yield scrapy.Request(url, callback=self.parse_http, \
+                        errback=self.errback_http, \
+                        cb_kwargs=dict(main_url=url), \
+                        dont_filter=True,\
+                        headers=self.headers)
 
+    # def parse(self, response):
+    #     # Successful request
+    #     end_time = datetime.datetime.now().timestamp()
+    #     self.end_times.append(end_time)
+    #     self.driver.get(response)
+    #     ob=Screenshot_Clipping.Screenshot()
+    #     ob.full_Screenshot(self.driver, save_path=save_screenshot, image_name='Myimage.png')
+    #     util.append_list_as_row([response.status, end_time,  response.url], results_file_path)
 
-    def __init__(self):
-        self.driver = webdriver.Chrome(ChromeDriverManager().install())
-
-    def parse(self, response):
+    def parse_http(self, response):
         # Successful request
         end_time = datetime.datetime.now().timestamp()
         self.end_times.append(end_time)
-        self.driver.get(response)
-        ob=Screenshot_Clipping.Screenshot()
-        ob.full_Screenshot(self.driver, save_path=save_screenshot, image_name='Myimage.png')
+
+        # self.logger.error('Got successful response from {}'.format(response.url))
+        util.append_list_as_row([response.status, end_time,  response.url], results_file_path)
+
+                # Successful request
+        end_time = datetime.datetime.now().timestamp()
         util.append_list_as_row([response.status, end_time,  response.url], results_file_path)
 
     def errback_http(self, failure):
@@ -94,7 +108,3 @@ class SpiderBot(scrapy.Spider):
         start_time = self.crawler.stats.get_value('start_time').timestamp()
         finish_time = self.crawler.stats.get_value('finish_time').timestamp()
         util.compile_stats(results_file_path, stats, finish_time-start_time)
-        self.driver.close()
-
-        self.driver.quit()
-
