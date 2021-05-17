@@ -16,8 +16,11 @@ times_results_i2p = folder_path + "logs/times_results_i2p.csv"
 stats_public = folder_path + "logs/stats_public.csv"
 stats_i2p = folder_path + "logs/stats_i2p.csv"
 
+crawled_links = folder_path + "logs/crawled_urls_pub.csv"
+crawled_links_i2p = folder_path + "logs/crawled_urls_i2p.csv"
 def clear_files():
-    files = [results_file_path, times_results, results_file_path_i2p, times_results_i2p, stats_i2p, stats_public]
+    files = [results_file_path, times_results, results_file_path_i2p, times_results_i2p,\
+         stats_i2p, stats_public, crawled_links, crawled_links_i2p]
     for file in files:
         open(file, 'w').close()
 
@@ -42,7 +45,7 @@ def append_list_as_row(list_of_elem, file):
         # Add contents of list as last row in the csv file
         csv_writer.writerow(list_of_elem)
    
-def compile_stats(logs_file, stats_file, runtime):
+def compile_stats(logs_file, stats_file, start, end):
     responce_codes = []
     with open(logs_file) as csv_file:
         reader = csv.reader(csv_file)
@@ -62,5 +65,6 @@ def compile_stats(logs_file, stats_file, runtime):
         writer = csv.writer(file)
         writer.writerows(res)
 
-    append_list_as_row(['crawler-runtime', runtime], stats_file)
+    append_list_as_row(['started', start], stats_file)
+    append_list_as_row(['ended', end], stats_file)
     

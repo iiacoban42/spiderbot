@@ -6,10 +6,10 @@ import logging
 import time
 import datetime
 import importlib
-
+from scrapy.linkextractors import LinkExtractor
 from scrapy.spidermiddlewares.httperror import HttpError
 from scrapy.exceptions import NotConfigured, IgnoreRequest
-from twisted.internet.error import TCPTimedOutError, TimeoutError, DNSLookupError
+from twisted.internet.error import TCPTimedOutError, TimeoutError, DNSLookupError, ConnectionRefusedError
 from selenium import webdriver
 
 util = importlib.import_module("util")
@@ -26,7 +26,7 @@ stats_i2p = folder_path + "logs/stats_i2p.csv"
 
 class SpiderBot(scrapy.Spider):
     name = "spiderbot"
-    n = 500
+    n = 4
     start_urls = util.get_top_websites(n)
     end_times = []
     user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
@@ -38,11 +38,11 @@ class SpiderBot(scrapy.Spider):
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
     'X-Requested-With': 'XMLHttpRequest'
 }
+    link_extractor = LinkExtractor()
     def start_requests(self):
         util.clear_files()
         for url in self.start_urls:
             
-            # yield SeleniumRequest(url=url, callback=self.parse_http, errback=self.errback_http, dont_filter=True)
             # public request
             yield scrapy.Request(url, callback=self.parse_http, \
                                     errback=self.errback_http, \
@@ -69,6 +69,16 @@ class SpiderBot(scrapy.Spider):
         else:
         # self.logger.error('Got successful response from {}'.format(response.url))
             util.append_list_as_row([response.status, end_time, main_url, response.url], logs_public)
+            
+            links_to_crawl = [main_url]
+            for i, link in enumerate(self.link_extractor.extract_links(response)):
+                if i == 0:
+                    continue
+                if i == 4:
+                    break 
+                links_to_crawl.append(link.url)
+            
+            util.append_list_as_row(links_to_crawl, folder_path + "logs/crawled_urls_pub.csv")
 
     def parse_http_i2p(self, response, main_url):
         # Successful request
@@ -80,6 +90,16 @@ class SpiderBot(scrapy.Spider):
         # self.logger.error('Got successful response from {}'.format(response.url))
         else:
             util.append_list_as_row([response.status, end_time, main_url, response.url], logs_i2p)
+            
+            links_to_crawl = [main_url]
+            for i, link in enumerate(self.link_extractor.extract_links(response)):
+                if i == 0:
+                    continue
+                if i == 4:
+                    break
+                links_to_crawl.append(link.url)
+        
+            util.append_list_as_row(links_to_crawl, folder_path + "logs/crawled_urls_i2p.csv")
 
 
     def errback_http(self, failure, main_url=None):
@@ -100,23 +120,10 @@ class SpiderBot(scrapy.Spider):
             else:
                 util.append_list_as_row([response.status, end_time, request.url], logs_public)
             # self.logger.error('HttpError on %s', response.url)
-
-        #elif isinstance(failure.value, DNSLookupError):
-        elif failure.check(DNSLookupError):
-            util.append_list_as_row(["DNSLookupError", end_time, request.url], logs_public)
-            # self.logger.error('DNSLookupError on %s', request.url)
-
-        #elif isinstance(failure.value, TCPTimedOutError):
-        elif failure.check(TCPTimedOutError):
-            util.append_list_as_row(["TCPTimeout", end_time, request.url], logs_public)
-            # self.logger.error('TCPTimeout on %s', request.url)
-
-        #elif isinstance(failure.value, TimeoutError):
-        elif failure.check(TimeoutError):
-            util.append_list_as_row(["TimeoutError", end_time, request.url], logs_public)
-            # self.logger.error('TimeoutError on %s', request.url)
         else:
-            util.append_list_as_row(["Err", end_time, request.url], logs_public)
+
+            util.append_list_as_row([str(failure.type()), end_time, request.url], logs_public)
+
 
     def errback_http_i2p(self, failure, main_url=None):
         # log all errback failures
@@ -136,30 +143,12 @@ class SpiderBot(scrapy.Spider):
             else:
                 util.append_list_as_row([response.status, end_time, request.url], logs_i2p)
             # self.logger.error('HttpError on %s', response.url)
-
-        #elif isinstance(failure.value, DNSLookupError):
-        elif failure.check(DNSLookupError):
-            util.append_list_as_row(["DNSLookupError", end_time, request.url], logs_i2p)
-            # self.logger.error('DNSLookupError on %s', request.url)
-
-        #elif isinstance(failure.value, TCPTimedOutError):
-        elif failure.check(TCPTimedOutError):
-            util.append_list_as_row(["TCPTimeout", end_time, request.url], logs_i2p)
-            # self.logger.error('TCPTimeout on %s', request.url)
-
-        #elif isinstance(failure.value, TimeoutError):
-        elif failure.check(TimeoutError):
-            util.append_list_as_row(["TimeoutError", end_time, request.url], logs_i2p)
-            # self.logger.error('TimeoutError on %s', request.url)
         else:
-            util.append_list_as_row(["Err", end_time, request.url], logs_i2p)
+            util.append_list_as_row([str(failure.type()), end_time, request.url], logs_i2p)
 
     def close(self, reason):
         start_time = self.crawler.stats.get_value('start_time')
         finish_time = self.crawler.stats.get_value('finish_time')
-        print(start_time)
-        print(finish_time)
-        start_time = start_time.timestamp()
-        finish_time = finish_time.timestamp()
-        util.compile_stats(logs_public, stats_public, finish_time-start_time)
-        util.compile_stats(logs_i2p, stats_i2p, finish_time-start_time)
+
+        util.compile_stats(logs_public, stats_public, start_time, finish_time)
+        util.compile_stats(logs_i2p, stats_i2p, start_time, finish_time)
