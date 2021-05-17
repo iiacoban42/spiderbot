@@ -9,17 +9,17 @@ folder_path = os.getcwd() + "/i2p/i2p/scraper/"
 # urls_file_path = folder_path + "urls.csv"
 urls_file_path = folder_path + "top500Domains.csv"
 results_file_path = folder_path  + "logs/logs_public.csv"
-times_results = folder_path + "logs/times_results_public.csv"
+subdom_pub = folder_path + "logs/subdomains_pub.csv"
 
 results_file_path_i2p = folder_path  + "logs/logs_i2p.csv"
-times_results_i2p = folder_path + "logs/times_results_i2p.csv"
+subdom_i2p = folder_path + "logs/subdomains_i2p.csv"
 stats_public = folder_path + "logs/stats_public.csv"
 stats_i2p = folder_path + "logs/stats_i2p.csv"
 
 crawled_links = folder_path + "logs/crawled_urls_pub.csv"
 crawled_links_i2p = folder_path + "logs/crawled_urls_i2p.csv"
 def clear_files():
-    files = [results_file_path, times_results, results_file_path_i2p, times_results_i2p,\
+    files = [results_file_path, subdom_pub, results_file_path_i2p, subdom_i2p,\
          stats_i2p, stats_public, crawled_links, crawled_links_i2p]
     for file in files:
         open(file, 'w').close()
