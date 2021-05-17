@@ -9,7 +9,6 @@ import importlib
 
 from scrapy.spidermiddlewares.httperror import HttpError
 from scrapy.exceptions import NotConfigured, IgnoreRequest
-from scrapy_selenium import SeleniumRequest
 from twisted.internet.error import TCPTimedOutError, TimeoutError, DNSLookupError
 from selenium import webdriver
 
@@ -156,7 +155,11 @@ class SpiderBot(scrapy.Spider):
             util.append_list_as_row(["Err", end_time, request.url], logs_i2p)
 
     def close(self, reason):
-        start_time = self.crawler.stats.get_value('start_time').timestamp()
-        finish_time = self.crawler.stats.get_value('finish_time').timestamp()
+        start_time = self.crawler.stats.get_value('start_time')
+        finish_time = self.crawler.stats.get_value('finish_time')
+        print(start_time)
+        print(finish_time)
+        start_time = start_time.timestamp()
+        finish_time = finish_time.timestamp()
         util.compile_stats(logs_public, stats_public, finish_time-start_time)
         util.compile_stats(logs_i2p, stats_i2p, finish_time-start_time)

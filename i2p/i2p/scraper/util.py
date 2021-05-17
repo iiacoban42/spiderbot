@@ -21,7 +21,7 @@ def clear_files():
     for file in files:
         open(file, 'w').close()
 
-def get_top_websites(n):
+def get_top_websites(n, start_from=0):
     # Parse urls.csv file
     urls = []
     with open(urls_file_path) as csv_file:
@@ -29,9 +29,10 @@ def get_top_websites(n):
         for i, line in enumerate(reader):
             if i>=n:
                 return urls
-            urls.append('http://' + line[1])
+            if i>=start_from:
+                urls.append('http://' + line[1])
 
-        return {k: v for v, k in enumerate(urls)}
+        return urls
 
 def append_list_as_row(list_of_elem, file):
     # Open file in append mode

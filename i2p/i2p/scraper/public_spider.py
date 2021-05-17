@@ -105,6 +105,8 @@ class SpiderBot(scrapy.Spider):
             # self.logger.error('TimeoutError on %s', request.url)
 
     def close(self, reason):
-        start_time = self.crawler.stats.get_value('start_time').timestamp()
-        finish_time = self.crawler.stats.get_value('finish_time').timestamp()
-        util.compile_stats(results_file_path, stats, finish_time-start_time)
+        start_time = self.crawler.stats.get_value('start_time')
+        finish_time = self.crawler.stats.get_value('finish_time')
+        print(start_time)
+        print(finish_time)
+        util.compile_stats(results_file_path, stats, finish_time.timestamp()-start_time.timestamp())
