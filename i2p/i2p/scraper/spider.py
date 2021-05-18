@@ -6,6 +6,7 @@ import logging
 import time
 import datetime
 import importlib
+import re
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spidermiddlewares.httperror import HttpError
 from scrapy.exceptions import NotConfigured, IgnoreRequest
@@ -63,16 +64,17 @@ class SpiderBot(scrapy.Spider):
         success_cb(response, main_url, logs_public)
         links_to_crawl = [main_url]
         for i, link in enumerate(self.link_extractor.extract_links(response)):
-            if i == 0:
-                continue
-            if i == 4:
-                break 
-            links_to_crawl.append(link.url)
-            yield scrapy.Request(link.url, callback=self.parse_http_crawled, \
-                                errback=self.errback_http_crawled, \
-                                cb_kwargs=dict(main_url=link.url), \
-                                dont_filter=True,\
-                                headers=self.headers)
+            if(len(links_to_crawl) >= 4):
+                break
+
+            if(remove_protocol(link.url) != remove_protocol(main_url)):
+                links_to_crawl.append(link.url)
+                yield scrapy.Request(link.url, callback=self.parse_http_crawled, \
+                            errback=self.errback_http_crawled, \
+                            cb_kwargs=dict(main_url=link.url), \
+                            dont_filter=True,\
+                            headers=self.headers)
+
         
         util.append_list_as_row(links_to_crawl, folder_path + "logs/crawled_urls_pub.csv")
 
@@ -82,20 +84,20 @@ class SpiderBot(scrapy.Spider):
   
         links_to_crawl = [main_url]
         for i, link in enumerate(self.link_extractor.extract_links(response)):
-            if i == 0:
-                continue
-            if i == 4:
+            if(len(links_to_crawl) >= 4):
                 break
-            links_to_crawl.append(link.url)
-            yield scrapy.Request(link.url, callback=self.parse_http_crawled_i2p, \
-                                errback=self.errback_http_crawled_i2p, \
-                                cb_kwargs=dict(main_url=link.url), \
-                                dont_filter=True, \
-                                headers=self.headers, \
-                                meta={
-                                "proxy": "http://127.0.0.1:4444"
-                                    })
-    
+                
+            if(remove_protocol(link.url) != remove_protocol(main_url)):
+                links_to_crawl.append(link.url)
+                yield scrapy.Request(link.url, callback=self.parse_http_crawled_i2p, \
+                            errback=self.errback_http_crawled_i2p, \
+                            cb_kwargs=dict(main_url=link.url), \
+                            dont_filter=True, \
+                            headers=self.headers, \
+                            meta={
+                            "proxy": "http://127.0.0.1:4444"
+                                })
+            
         util.append_list_as_row(links_to_crawl, folder_path + "logs/crawled_urls_i2p.csv")
 
     def parse_http_crawled(self, response, main_url):
@@ -164,7 +166,7 @@ def err_cb(failure, log_file):
         request = failure.request
         util.append_list_as_row(["TimeoutError", end_time, request.url], log_file)
     else:
-        util.append_list_as_row([str(failure.type()), end_time, request.url], log_file)
+        util.append_list_as_row(["Err", end_time, request.url], log_file)
 
 def success_cb(response, main_url, log_file):
     end_time = datetime.datetime.now().timestamp()
@@ -173,3 +175,10 @@ def success_cb(response, main_url, log_file):
         util.append_list_as_row(["CAPTCHA", end_time, main_url, response.url], log_file)
     else:
         util.append_list_as_row([response.status, end_time, main_url, response.url], log_file)
+
+def remove_protocol(url):
+    if url.startswith('http'):
+        url = re.sub(r'^https?:\/\/', '', url)
+    if url.startswith('www.'):
+        url = re.sub(r'www.', '', url)
+    return url.strip('/')
