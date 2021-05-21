@@ -69,6 +69,11 @@ def run_spider():
     for url in start_urls:
         sub_domain = 0
         for link in url:
+            image = screenshot_i2p + str(main_domain)+"_"+ str(sub_domain)+'i2p.png'
+ 
+            if(os.path.exists(image)):
+                continue
+
             with webdriver.Chrome(options=chrome_options) as i2p_driver:
                 try:
                     save = screenshot_i2p + str(main_domain)+"_"+ str(sub_domain)+'i2p.png'
@@ -78,7 +83,7 @@ def run_spider():
                 
                 except TimeoutException:
                     print('i2p timeout on ' + str(main_domain)+"_"+ str(sub_domain))
-            
+
             with webdriver.Chrome(options=chrome_options_pub) as driver:
                 try:
                     save = screenshot_pub + str(main_domain)+"_"+ str(sub_domain) +'pub.png'
@@ -88,7 +93,7 @@ def run_spider():
         
                 except TimeoutException:
                     print('pub timeout on ' + str(main_domain)+"_"+ str(sub_domain))
-            
+
             sub_domain += 1
         
         main_domain += 1
