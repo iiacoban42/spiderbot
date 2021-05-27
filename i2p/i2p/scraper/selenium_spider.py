@@ -50,7 +50,7 @@ def get_sites(n, start_from=0):
         return urls
 
 n = 500
-start_from = 0
+start_from = 77
 # start_urls = util.get_top_websites(n, start_from)
 start_urls = get_sites(n, start_from)
 PROXY = "127.0.0.1:4444"
@@ -65,16 +65,21 @@ chrome_options_pub = webdriver.ChromeOptions()
 chrome_options_pub.add_extension(folder_path+"extentions/cookie.crx")
 
 def run_spider():
+    counter = 0
     main_domain = start_from
     for url in start_urls:
         sub_domain = 0
         for link in url:
+            
             image = screenshot_i2p + str(main_domain)+"_"+ str(sub_domain)+'i2p.png'
+            
  
             if(os.path.exists(image)):
                 continue
+            counter +=1
 
             with webdriver.Chrome(options=chrome_options) as i2p_driver:
+                print(link + str(main_domain))
                 try:
                     save = screenshot_i2p + str(main_domain)+"_"+ str(sub_domain)+'i2p.png'
                     i2p_driver.get(link)
@@ -83,6 +88,7 @@ def run_spider():
                 
                 except TimeoutException:
                     print('i2p timeout on ' + str(main_domain)+"_"+ str(sub_domain))
+                    continue
 
             with webdriver.Chrome(options=chrome_options_pub) as driver:
                 try:
@@ -97,6 +103,7 @@ def run_spider():
             sub_domain += 1
         
         main_domain += 1
+    print(counter)
 
 
 run_spider()
