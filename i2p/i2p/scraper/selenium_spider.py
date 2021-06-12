@@ -21,8 +21,11 @@ urls_file_path = folder_path + "urls.csv"
 results_file_path = folder_path  + "logs/logs_public.csv"
 times_results = folder_path + "logs/times_results_public.csv"
 stats = folder_path + "logs/stats_public.csv"
-screenshot_pub = folder_path + "screenshots/pub/"
-screenshot_i2p = folder_path + "screenshots/i2p/"
+# screenshot_pub = folder_path + "screenshots/pub/"
+# screenshot_i2p = folder_path + "screenshots/i2p/"
+
+screenshot_pub = folder_path + "screenshots/experiment/"
+screenshot_i2p = folder_path + "screenshots/experiment/"
 
 def success(site):
     if (re.search("^2..", site) or re.search("^3..", site)):
@@ -34,8 +37,8 @@ def get_sites(n, start_from=0):
     # Parse urls.csv file
     urls = []
     folder_path = os.getcwd() + "/i2p/i2p/scraper/"
-# urls_file_path = folder_path + "urls.csv"
-    urls_file_path = folder_path + "crawled_urls.csv"
+    urls_file_path = folder_path + "experiment.csv"
+    # urls_file_path = folder_path + "crawled_urls.csv"
     with open(urls_file_path) as csv_file:
         reader = csv.reader(csv_file)
         for i, line in enumerate(reader):
@@ -50,7 +53,7 @@ def get_sites(n, start_from=0):
         return urls
 
 n = 500
-start_from = 77
+start_from = 0
 # start_urls = util.get_top_websites(n, start_from)
 start_urls = get_sites(n, start_from)
 PROXY = "127.0.0.1:4444"
@@ -65,21 +68,19 @@ chrome_options_pub = webdriver.ChromeOptions()
 chrome_options_pub.add_extension(folder_path+"extentions/cookie.crx")
 
 def run_spider():
-    counter = 0
     main_domain = start_from
+
     for url in start_urls:
         sub_domain = 0
         for link in url:
             
             image = screenshot_i2p + str(main_domain)+"_"+ str(sub_domain)+'i2p.png'
-            
- 
+
             if(os.path.exists(image)):
+                sub_domain +=1
                 continue
-            counter +=1
 
             with webdriver.Chrome(options=chrome_options) as i2p_driver:
-                print(link + str(main_domain))
                 try:
                     save = screenshot_i2p + str(main_domain)+"_"+ str(sub_domain)+'i2p.png'
                     i2p_driver.get(link)
@@ -103,7 +104,6 @@ def run_spider():
             sub_domain += 1
         
         main_domain += 1
-    print(counter)
 
 
 run_spider()
