@@ -20,12 +20,12 @@ http://photos.google.com,Media Sharing
 http://prnewswire.com,Business
 http://qz.com,Blogs/Wiki
 http://scoop.it,Internet Services
-http://scribd.com,Personal Network Storage Media Sharing
+http://scribd.com,Personal Network Storage
 http://search.yahoo.com,Search Engines
 http://sendspace.com,Personal Network Storage
 http://slate.com,Politics/Opinion
-http://slideshare.net,Personal Network Storage Interactive Web Applications
-http://theatlantic.com,General News Politics/Opinion
+http://slideshare.net,Personal Network Storage
+http://theatlantic.com,General News
 http://thetimes.co.uk,General News
 http://udemy.com,Education/Reference
 http://undeveloped.com,Marketing/Merchandising
@@ -35,14 +35,14 @@ http://ziddu.com,Personal Network Storage
 https://abcnews.go.com/US,General News
 https://checkout.buydomai,Internet Services
 https://de.wikipedia.org/,Blogs/Wiki
-https://deadspin.com,Entertainment Blogs/Wiki
+https://deadspin.com,Blogs/Wiki
 https://dribbble.com/acre,Business
 https://e.mail.ru/login?f,Web Mail
-https://es.wikipedia.org/,Education/Reference Blogs/Wiki
+https://es.wikipedia.org/,Blogs/Wiki
 https://eu.usatoday.com/n,General News
 https://fortune.com/ranki,Finance/Banking
 https://gizmodo.com,Blogs/Wiki
-https://issuu.com:443/,Interactive Web Applications Media Sharing
+https://issuu.com:443/,Interactive Web Applications
 https://mashable.com/ente,Blogs/Wiki
 https://myspace.com/disco,Entertainment
 https://passport.alibaba.,Business
@@ -51,37 +51,37 @@ https://russian.rt.com/,General News
 https://secure.id.fc2.com,Internet Services
 https://services.business,General News
 https://thehill.com/#main,General News
-https://vimeo.com/log_in,Streaming Media Media Sharing
-https://www.adobe.com/cre,Business Software/Hardware
+https://vimeo.com/log_in,Media Sharing
+https://www.adobe.com/cre,Business
 https://www.bbc.co.uk,General News
 https://www.bbc.com/#orb-,General News
 https://www.bloglovin.com,Blogs/Wiki
-https://www.bloomberg.com,Finance/Banking General News
-https://www.ca.gov/#main-,Public Information Government/Military
+https://www.bloomberg.com,General News
+https://www.ca.gov/#main-,Public Information
 https://www.chicagotribun,General News
-https://www.cnbc.com/mark,Finance/Banking General News
-https://www.cnbc.com/worl,Finance/Banking General News
+https://www.cnbc.com/mark,General News
+https://www.cnbc.com/worl,General News
 https://www.corriere.it/c,General News
 https://www.corriere.it/f,General News
-https://www.debian.org/#c,Business Software/Hardware
+https://www.debian.org/#c,Software/Hardware
 https://www.e-recht24.de/,Marketing/Merchandising
-https://www.ea.com/games/,Games Unverified
+https://www.ea.com/games/,Games
 https://www.espn.com/,Sports
 https://www.espn.com/nfl/,Sports
 https://www.ft.com#site-n,General News
 https://www.harvard.edu/c,Education/Reference
-https://www.ign.com/artic,EntertainmentGames Blogs/Wiki
+https://www.ign.com/artic,Games
 https://www.imdb.com/list,Entertainment
 https://www.inc.com/camer,Business
 https://www.inc.com/myacc,Business
-https://www.intel.com/con,Business Software/Hardware
-https://www.intel.com/con,Business Software/Hardware
+https://www.intel.com/con,Business
+https://www.intel.com/con,Business
 https://www.istockphoto.c,Internet Services
 https://www.linkedin.com/,Professional Networking
 https://www.linkedin.com/,Professional Networking
 https://www.marketwatch.c,Finance/Banking
 https://www.netvibes.com/,Business
-https://www.pbs.org/searc,Education/Reference General News
+https://www.pbs.org/searc,Streaming Media
 https://www.princeton.edu,Education/Reference
 https://www.repubblica.it,General News
 https://www.samsung.com/u,Business
@@ -100,13 +100,13 @@ https://www.whitehouse.go,Government/Military
 https://www.wikihow.com/S,Blogs/Wiki
 http://aol.com,Portal Sites
 http://bbc.com,General News
-http://cnbc.com,Finance/BankingGeneral News
+http://cnbc.com,General News
 http://dw.com,General News
 http://espn.go.com,Sports
-http://issuu.com,Interactive Web ApplicationsMedia Sharing
+http://issuu.com,Interactive Web Applications
 http://istockphoto.com,Internet Services
 http://mediafire.com,Personal Network Storage
-http://narod.ru,Personal Page Internet Services
+http://narod.ru,Internet Services
 http://nasa.gov,Government/Military
 http://photobucket.com,Media Sharing
 http://photos.google.com,Media Sharing
@@ -118,9 +118,9 @@ https://arabic.rt.com/,General News
 https://chrome.google.com,Software/Hardware
 https://clean.marriott.co,Travel
 https://en.calameo.com/,Interactive Web Applications
-https://en.wikipedia.org/,Education/ReferenceBlogs/Wiki
-https://en.wikipedia.org/,Education/Reference Blogs/Wiki
-https://es.wikipedia.org/,Education/Reference Blogs/Wiki
+https://en.wikipedia.org/,Blogs/Wiki
+https://en.wikipedia.org/,Blogs/Wiki
+https://es.wikipedia.org/,Blogs/Wiki
 https://fortune.com/fortu,Finance/Banking
 https://gizmodo.com,Blogs/Wiki
 https://nypost.com/metro/,General News
@@ -132,6 +132,6 @@ https://www.e-recht24.de/,Internet Services
 https://www.elmundo.es/es,General News
 https://www.entrepreneur.,Business
 https://www.istockphoto.c,Internet Services
-https://www.slideshare.ne,Personal Network Storage Interactive Web Applications
+https://www.slideshare.net,Personal Network Storage
 https://www.thedailybeast,General News
-https://www.theguardian.c,General News
+https://www.theguardian.co.uk,General News
