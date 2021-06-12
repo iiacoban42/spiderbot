@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+"""Create pie chart stats"""
 import matplotlib.pyplot as plt
 import csv
 import pickle
@@ -10,19 +10,12 @@ from collections import Counter
 path = os.getcwd() + '/i2p/i2p/scraper/diff_stats/stats/'
 path_i2p = os.getcwd() + '/i2p/i2p/scraper/diff_stats/stats/code_stats_i2p.csv'
 path_public = os.getcwd() + '/i2p/i2p/scraper/diff_stats/stats/code_stats_public.csv'
-# The slices will be ordered and plotted counter-clockwise.
 
 def create_pie_chart(labels, sizes, name):
-    # labels = [r'Rayos X (88.4 %)', r'RMN en solucion (10.6 %)', 
-    # r'Microscopia electronica (0.7 %)', r'Otros (0.3 %)']
-    # sizes = [88.4, 10.6, 0.7, 0.3]
-    # colors = ['orange', 'gold', 'lightskyblue']
     patches, texts = plt.pie(sizes, startangle=90)
     plt.legend(patches, labels, loc="best")
-    # Set aspect ratio to be equal so that pie is drawn as a circle.
     plt.axis('equal')
     plt.tight_layout()
-    # plt.figtext(0.5, 0.01, caption, wrap=True, horizontalalignment='center', fontsize=12)
     plt.savefig(name + '.png')
     plt.show()
 
@@ -59,8 +52,6 @@ create_pie_chart(["Not Blocked " + str(not_blocked) + "%",\
                     [not_blocked, blocked, partly_blocked],  "blocking")
 
 total_samples = 126
-
-
 missing_img = round(55 /total_samples * 100, 2)
 missing_scripts = round(12 /total_samples *100, 2)
 missing_info = round(6 / total_samples * 100, 2)
@@ -82,5 +73,5 @@ lables = [
 "Scripts " + str(missing_scripts) + "%",
 "Other information " + str(missing_info) + "%"
 ]
-create_pie_chart(lables, val,  "partial-blocking")
 
+create_pie_chart(lables, val,  "partial-blocking")

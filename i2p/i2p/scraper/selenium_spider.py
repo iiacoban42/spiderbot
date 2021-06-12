@@ -1,12 +1,9 @@
+"""Request and screenhot sites with selenium"""
 import csv
 import os
-import pickle
-import logging
-import time
-import datetime
-import importlib
-import time
 import re
+import time
+import importlib
 import urllib as url
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -37,8 +34,8 @@ def get_sites(n, start_from=0):
     # Parse urls.csv file
     urls = []
     folder_path = os.getcwd() + "/i2p/i2p/scraper/"
-    urls_file_path = folder_path + "experiment.csv"
-    # urls_file_path = folder_path + "crawled_urls.csv"
+    # urls_file_path = folder_path + "experiment.csv"
+    urls_file_path = folder_path + "crawled_urls.csv"
     with open(urls_file_path) as csv_file:
         reader = csv.reader(csv_file)
         for i, line in enumerate(reader):

@@ -1,3 +1,4 @@
+"""Create http status code stats with data from stats/logs_public.csv and stats/logs_i2p.csv"""
 import csv
 import pickle
 import time

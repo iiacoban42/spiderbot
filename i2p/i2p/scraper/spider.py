@@ -1,3 +1,4 @@
+"""Requests sites with scrapy and log http status codes"""
 import csv
 import os
 import scrapy
