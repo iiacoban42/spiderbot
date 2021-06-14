@@ -111,15 +111,16 @@ def test_hypothesis_proportions():
     # source: https://sonalake.com/latest/hypothesis-testing-of-proportion-based-samples/
     # can we assume anything from our sample
     significance = 0.05
-    # our sample - 82% are good
+    # our sample - 89% are good
     sample_success = 1367
     sample_size = 1520
-    # our Ho is  80%
+   
+    # our Ho is  85%
     null_hypothesis = 0.85
-    # check our sample against Ho for Ha < Ho
-    # for Ha > Ho use alternative='smaller'
+    # check our sample against Ho for Ha > Ho
+    # for Ha < Ho use alternative='smaller'
     # for Ha != Ho use alternative='two-sided'
-    stat, p_value = proportions_ztest(count=sample_success, nobs=sample_size, value=null_hypothesis, alternative='smaller')
+    stat, p_value = proportions_ztest(count=sample_success, nobs=sample_size, value=null_hypothesis, alternative='larger')
     # report
     print('z_stat: %0.3f, p_value: %0.3f' % (stat, p_value))
     if p_value > significance:
@@ -128,5 +129,6 @@ def test_hypothesis_proportions():
         print ("Reject the null hypothesis - suggest the alternative hypothesis is true")
 
 generate_pie_charts()
-#z_stat: 6.394, p_value: 1.000
+#z_stat: 6.394, p_value: 0.000
+#Reject the null hypothesis - suggest the alternative hypothesis is true
 test_hypothesis_proportions()
