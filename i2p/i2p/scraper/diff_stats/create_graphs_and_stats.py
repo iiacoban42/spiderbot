@@ -7,6 +7,7 @@ import datetime
 import os
 import re
 from collections import Counter
+from statsmodels.stats.proportion import proportions_ztest
 path = os.getcwd() + '/i2p/i2p/scraper/diff_stats/stats/'
 path_i2p = os.getcwd() + '/i2p/i2p/scraper/diff_stats/stats/code_stats_i2p.csv'
 path_public = os.getcwd() + '/i2p/i2p/scraper/diff_stats/stats/code_stats_public.csv'
@@ -17,7 +18,7 @@ def create_pie_chart(labels, sizes, name):
     plt.axis('equal')
     plt.tight_layout()
     plt.savefig(name + '.png')
-    plt.show()
+    # plt.show()
 
 def generate_status_codes_pie():
     i2p_codes = []
@@ -97,10 +98,35 @@ def generate_categorized_blocking_websites_pie():
         p = round(val / n * 100, 2)
         lables.append(key + " " + str(p) + "%")
         values.append(p)
-        print(key + " " + str(p) + "%")
     create_pie_chart(lables, values,  "categories")
 
-# generate_blocking_proportions()
-# generate_status_codes_pie()
-# generate_blocked_content_pie()
-generate_categorized_blocking_websites_pie()
+def generate_pie_charts():
+    generate_blocking_proportions()
+    generate_status_codes_pie()
+    generate_blocked_content_pie()
+    generate_categorized_blocking_websites_pie()
+
+
+def test_hypothesis_proportions():
+    # source: https://sonalake.com/latest/hypothesis-testing-of-proportion-based-samples/
+    # can we assume anything from our sample
+    significance = 0.05
+    # our sample - 82% are good
+    sample_success = 1367
+    sample_size = 1520
+    # our Ho is  80%
+    null_hypothesis = 0.85
+    # check our sample against Ho for Ha < Ho
+    # for Ha > Ho use alternative='smaller'
+    # for Ha != Ho use alternative='two-sided'
+    stat, p_value = proportions_ztest(count=sample_success, nobs=sample_size, value=null_hypothesis, alternative='smaller')
+    # report
+    print('z_stat: %0.3f, p_value: %0.3f' % (stat, p_value))
+    if p_value > significance:
+        print ("Fail to reject the null hypothesis - we have nothing else to say")
+    else:
+        print ("Reject the null hypothesis - suggest the alternative hypothesis is true")
+
+generate_pie_charts()
+#z_stat: 6.394, p_value: 1.000
+test_hypothesis_proportions()
