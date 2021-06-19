@@ -14,11 +14,11 @@ path_public = os.getcwd() + '/i2p/i2p/scraper/diff_stats/stats/code_stats_public
 
 def create_pie_chart(labels, sizes, name):
     patches, texts = plt.pie(sizes, startangle=90)
-    plt.legend(patches, labels, loc="best")
+    plt.legend(patches, labels, loc="lower center")
     plt.axis('equal')
     plt.tight_layout()
     plt.savefig(name + '.png')
-    # plt.show()
+    plt.show()
 
 def generate_status_codes_pie():
     i2p_codes = []
@@ -114,7 +114,7 @@ def test_hypothesis_proportions():
     # our sample - 89% are good
     sample_success = 1367
     sample_size = 1520
-   
+
     # our Ho is  85%
     null_hypothesis = 0.85
     # check our sample against Ho for Ha > Ho

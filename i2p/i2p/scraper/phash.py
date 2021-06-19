@@ -26,8 +26,6 @@ def move_same():
         if hash_diff == 0:
             shutil.move(i2p_img, folder_path + "screenshots/not_blocked/")
             shutil.move(pub_img, folder_path + "screenshots/not_blocked/")
-# print(images_pub[350:400])
-# print(images_i2p[350:400])
 
 move_same()
 
